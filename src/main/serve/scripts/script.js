@@ -706,3 +706,25 @@ Judging Page
             alert(`New Result: ${verdict_name[data]}`);
         });
     }
+
+    function download(id) {
+        $(".download").attr("disabled", true);
+        $(".download").addClass("button-gray");
+
+        $.post("/download", {id: id}, data => {
+            $(".download").attr("disabled", false);
+            $(".download").removeClass("button-gray");
+            console.log(data)
+            files = JSON.parse(data)
+            console.log(files)
+            let zip = new JSZip();
+            jQuery.each(files, (name, value) => {
+                zip.file(name, value)
+            })
+            zip.generateAsync({type:"blob"}).then((blob) => {
+                saveAs(blob, "download.zip");
+                $(".download").attr("disabled", false);
+                $(".download").removeClass("button-gray");
+            });
+        });
+    }

@@ -100,6 +100,8 @@ class SubmissionCard(UIElement):
                 h.br(),
                 h.br(),
                 h.button("Rejudge", type="button", onclick=f"rejudge('{submission.id}')", cls="btn btn-primary rejudge"),
+                h.span(" "),
+                h.button("Download", type="button", onclick=f"download('{submission.id}')", cls="btn btn-primary download"),
                 h.br(),
                 h.br(),
                 h.strong("Code:"),
