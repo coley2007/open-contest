@@ -138,7 +138,7 @@ def rejudgeAll(params, setHeader, user):
     ctime = time.time() * 1000
     for contestant in User.all():
         for submission in [s for s in Submission.all() if s.problem.id == id and s.user == contestant
-                            and Contest.getCurrent().start s.timestamp < ctime and s.result != "reject"]:
+                            and Contest.getCurrent().start < s.timestamp < ctime and s.result != "reject"]:
             if os.path.exists(f"/tmp/{submission.id}"):
                 shutil.rmtree(f"/tmp/{submission.id}")
             runCode(submission)
