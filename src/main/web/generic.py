@@ -13,7 +13,7 @@ def login(params, setHeader, user):
         setHeader("Set-Cookie", f"userType={user.type}")
         return "ok"
     else:
-        return "Incorrect username / password";
+        return "Incorrect username / password"
 
 def logout(params, setHeader, user):
     setHeader("Location", "/login")
