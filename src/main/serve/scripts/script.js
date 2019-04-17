@@ -415,10 +415,19 @@ Contest page
         var endDate = $("#contest-end-date").val();
         var endTime = $("#contest-end-time").val();
         var scoreboardOffTime = $("#scoreboard-off-time").val();
+        var showProblemInfoBlocks = $("#show-problem-info-blocks").val()
 
-        var start = new Date(`${startDate} ${startTime}`).getTime();
-        var end = new Date(`${endDate} ${endTime}`).getTime();
-        var endScoreboard = new Date(`${endDate} ${scoreboardOffTime}`).getTime();
+        // Invalid DATE format; "T" after the date and "Z" after the time have been inserted 
+        // for the correct format for creating the Dates, then the milliseconds are adjusted 
+        // for the correct time zone for each of the following variables, since "Z" assumes you
+        // are entering a UTC time.
+
+        var start = new Date(`${startDate}T${startTime}Z`);
+        start = start.getTime() + (start.getTimezoneOffset() * 60000);
+        var end = new Date(`${endDate}T${endTime}Z`);
+        end = end.getTime() + (end.getTimezoneOffset() * 60000);
+        var endScoreboard = new Date(`${endDate}T${scoreboardOffTime}Z`);
+        endScoreboard = endScoreboard.getTime() + (endScoreboard.getTimezoneOffset() * 60000);
 
         if (end <= start) {
             alert("The end of the contest must be after the start.");
@@ -446,11 +455,11 @@ Contest page
             problems.push(newProblem);
         }
 
-        $.post("/editContest", {id: id, name: name, start: start, end: end, scoreboardOff: endScoreboard, problems: JSON.stringify(problems)}, id => {
+        $.post("/editContest", {id: id, name: name, start: start, end: end, scoreboardOff: endScoreboard, problems: JSON.stringify(problems), showProblemInfoBlocks: showProblemInfoBlocks}, id => {
             if (window.location.pathname == "/contests/new") {
                 window.location = `/contests/${id}`;
             } else {
-                window.location.reload()
+                window.location.reload();
             }
         });
     }
@@ -476,6 +485,9 @@ Contest page
         var endScoreboard = new Date(parseInt($("#scoreboardOff").val()));
         $("#scoreboard-off-time").val(`${fix(endScoreboard.getHours())}:${fix(endScoreboard.getMinutes())}`);
 
+        var showProblemInfoBlocks = $("#showProblemInfoBlocks").val();
+        $("#show-problem-info-blocks").val(showProblemInfoBlocks);
+        
         $("div.problem-cards").sortable({
             placeholder: "ui-state-highlight",
             forcePlaceholderSize: true,

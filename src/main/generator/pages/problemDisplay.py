@@ -47,22 +47,35 @@ def viewProblem(params, user):
         if problem not in Contest.getCurrent().problems:
             return ""
     
-    return Page(
-        h.input(type="hidden", id="problem-id", value=problem.id),
-        h2(problem.title, cls="page-title"),
-        div(cls="problem-description", contents=[
-            Card("Problem Statement", formatMD(problem.statement), cls="stmt"),
-            Card("Input Format", formatMD(problem.input), cls="inp"),
-            Card("Output Format", formatMD(problem.output), cls="outp"),
-            Card("Constraints", formatMD(problem.constraints), cls="constraints"),
-            div(cls="samples", contents=list(map(lambda x: getSample(x[0], x[1]), zip(problem.sampleData, range(problem.samples)))))
-        ]),
-        CodeEditor(),
-        div(cls="align-right", contents=[
-            h.button("Test Code", cls="button test-samples button-white"),
-            h.button("Submit Code", cls="button submit-problem")
-        ])
-    )
+    contest = Contest.getCurrent()
+	
+    if contest == None or contest.showProblemInfoBlocks == "On":
+        return Page(
+            h.input(type="hidden", id="problem-id", value=problem.id),
+            h2(problem.title, cls="page-title"),
+            div(cls="problem-description", contents=[
+                Card("Problem Statement", formatMD(problem.statement), cls="stmt"),
+                Card("Input Format", formatMD(problem.input), cls="inp"),
+                Card("Output Format", formatMD(problem.output), cls="outp"),
+                Card("Constraints", formatMD(problem.constraints), cls="constraints"),
+                div(cls="samples", contents=list(map(lambda x: getSample(x[0], x[1]), zip(problem.sampleData, range(problem.samples)))))
+            ]),
+            CodeEditor(),
+            div(cls="align-right", contents=[
+                h.button("Test Code", cls="button test-samples button-white"),
+                h.button("Submit Code", cls="button submit-problem")
+            ])
+        )
+    else :
+        return Page(
+            h.input(type="hidden", id="problem-id", value=problem.id),
+            h2(problem.title, cls="page-title"),
+            CodeEditor(),
+            div(cls="align-right", contents=[
+                h.button("Test Code", cls="button test-samples button-white"),
+                h.button("Submit Code", cls="button submit-problem")
+            ])
+        )
 
 def listProblems(params, user):
     if Contest.getCurrent():

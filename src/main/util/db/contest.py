@@ -19,13 +19,15 @@ class Contest:
             self.end      = int(details["end"])
             self.scoreboardOff = int(details.get("scoreboardOff", self.end))
             self.problems = [Problem.get(id) for id in details["problems"]]
+            self.showProblemInfoBlocks = details["showProblemInfoBlocks"]
         else:
             self.id = None
             self.name = None
             self.start = None
             self.end = None
             self.scoreboardOff = None
-            self.problems = None            
+            self.problems = None
+            self.showProblemInfoBlocks = None               
 
     def get(id: str):
         with lock.gen_rlock():
@@ -40,7 +42,8 @@ class Contest:
             "start": self.start,
             "end": self.end,
             "scoreboardOff": self.scoreboardOff,
-            "problems": [prob.id for prob in self.problems]
+            "problems": [prob.id for prob in self.problems],
+	        "showProblemInfoBlocks": self.showProblemInfoBlocks
         }
 
     def save(self):
@@ -64,7 +67,8 @@ class Contest:
                 "name": self.name,
                 "start": self.start,
                 "end": self.end,
-                "problems": [prob.toJSONSimple() for prob in self.problems]
+                "problems": [prob.toJSONSimple() for prob in self.problems],
+	            "showProblemInfoBlocks": self.showProblemInfoBlocks
             }
     
     def allJSON():

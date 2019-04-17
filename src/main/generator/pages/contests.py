@@ -40,11 +40,13 @@ def editContest(params, user):
     existingProblems = []
     start = time.time() * 1000
     end = (time.time() + 3600) * 1000
+    showProblemInfoBlocks = "On"
     if contest:
         title = contest.name
         start = contest.start
         end = contest.end
         scoreboardOff = contest.scoreboardOff
+        showProblemInfoBlocks = contest.showProblemInfoBlocks
         chooseProblem = div(cls="actions", contents=[
             h.button("+ Choose Problem", cls="button", onclick="chooseProblemDialog()")
         ])
@@ -96,16 +98,23 @@ def editContest(params, user):
                     h.label(**{"for": "contest-end-time", "contents":"End Time"}),
                     h.input(cls="form-control", name="contest-end-time", id="contest-end-time", type="time")
                 ]),
+                h.input(type="hidden", id="showProblemInfoBlocks", value=showProblemInfoBlocks),
+                div(cls="form-group col-6", contents=[
+                    h.label(**{"for": "show-problem-info-blocks", "contents":"Show Problem Info Blocks"}),
+                    h.select(cls="form-control", name="show-problem-info-blocks", id="show-problem-info-blocks", contents=[
+                        h.option("On", value="On"),
+                        h.option("Off", value="Off")
+                    ]),
+                ]),
                 h.input(type="hidden", id="scoreboardOff", value=scoreboardOff),
-                div(cls="form-group col-6"),
                 div(cls="form-group col-6", contents=[
                     h.label(**{"for": "scoreboard-off-time", "contents":"Turn Scoreboard Off Time"}),
                     h.input(cls="form-control", name="scoreboard-off-time", id="scoreboard-off-time", type="time")
-                ])
-            ]),
+                ]),
             div(cls="align-right col-12", contents=[
                 h.button("Save", cls="button", onclick="editContest()")
-            ])
+            ]),
+            ]),
         ])),
         *existingProblems
     )
