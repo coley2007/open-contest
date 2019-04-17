@@ -1,4 +1,4 @@
-from code.util.db import Submission, User, Contest
+from code.util.db import Submission, User, Contest, Problem
 from code.generator.lib.htmllib import *
 from code.generator.lib.page import *
 import logging
@@ -73,6 +73,11 @@ def leaderboard(params, user):
 
     return Page(
         h2("Leaderboard", cls="page-title"),
+        div(cls="actions", contents=[
+	            h.a(href="/detailedReport", contents=[
+	                h.button("Detailed Report", cls="button get-report")
+	            ])
+	        ]),
         h.table(
             h.thead(
                 h.tr(

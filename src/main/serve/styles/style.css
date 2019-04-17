@@ -507,6 +507,45 @@ Leaderboard Page
     }
 
 /*--------------------------------------------------------------------------------------------------
+Detailed Reports Page
+--------------------------------------------------------------------------------------------------*/
+	    .fs table {
+	        box-shadow: 0 2px 10px 0 rgba(0,0,0,.2);
+	        width: 100%;
+	        background-color: white;
+	    }
+	    .fs thead {
+	        border-bottom: 2px solid #b4e0c0;
+	        background-color: #dcf0e2;
+	        color: #093;
+	        font-size: 1em
+	    }
+	    .fs tr {
+	        border-bottom: 1px solid #ccc;
+	        font-size: 0.7em
+	    }
+	    .fs tr:nth-child(2n) {
+	        background-color: #f4f4f4;
+	        font-size: 0.7em
+	    }
+	    .fs td, .fs th {
+	        padding: 3px;
+	    }
+	    .fs td.center, .fs th.center {
+	        text-align: center;
+	    }
+	    #probSummary table, #probSummary tr, #probSummary td, #probSummary th {
+	        font-size: 1em;
+	        text-align: center
+	    }
+	    #langBreakdown table, #langBreakdown tr, #langBreakdown td, #langBreakdown th {
+	        font-size: 1em;
+	        text-align: center
+	    }
+	    .detRepp {
+	        font-size: 0.7em;
+	    }
+/*--------------------------------------------------------------------------------------------------
 FAQ Page
 --------------------------------------------------------------------------------------------------*/
     .qa-question::before {
