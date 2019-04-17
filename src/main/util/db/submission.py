@@ -25,6 +25,9 @@ class Submission:
             self.errors      = details["errors"]
             self.answers     = details["answers"]
             self.result      = details["result"]
+            self.submissionStatus = details["submissionStatus"]
+            self.checkout    = details["checkout"]
+            self.version     = int(details["version"])
         else:
             self.id          = None
             self.user        = None
@@ -39,6 +42,9 @@ class Submission:
             self.errors      = []
             self.answers     = []
             self.result      = []
+            self.submissionStatus = None
+            self.checkout    = None
+            self.version     = 1
 
     def get(id: str):
         with lock.gen_rlock():
@@ -60,7 +66,10 @@ class Submission:
             "outputs":   self.outputs,
             "errors":    self.errors,
             "answers":   self.answers,
-            "result":    self.result
+            "result":    self.result,
+            "submissionStatus": self.submissionStatus,
+            "checkout":  self.checkout,
+            "version":   self.version
         }
 
     def save(self):
@@ -91,7 +100,10 @@ class Submission:
                     "code":      self.code,
                     "type":      self.type,
                     "compile":   self.compile,
-                    "results":   self.results
+                    "results":   self.results,
+                    "submissionStatus": self.submissionStatus,
+                    "checkout":  self.checkout,
+                    "version":   self.version
                 }
             return {
                 "id":        self.id,
@@ -106,7 +118,10 @@ class Submission:
                 "outputs":   self.outputs[:self.problem.samples],
                 "errors":    self.errors[:self.problem.samples],
                 "answers":   self.answers[:self.problem.samples],
-                "result":    self.result
+                "result":    self.result,
+                "submissionStatus": self.submissionStatus,
+                "checkout":  self.checkout,
+                "version":   self.version
             }
 
     def forEach(callback: callable):

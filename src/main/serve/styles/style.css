@@ -562,6 +562,9 @@ Judging Page
         font-weight: bold;
         margin-top: 5px;
     }
+    .fltrow {
+        font-size: 0.7em;
+    }
     .modal-dialog {
         max-width: 70vw;
     }

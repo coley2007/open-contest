@@ -1,8 +1,9 @@
-from code.util import register
-from code.util.db import Contest, Problem, Submission
+from code.util import register, auth
+from code.util.db import Contest, Problem, Submission, User
 from code.generator.lib.htmllib import *
 from code.generator.lib.page import *
 
+import os
 import logging
 from datetime import datetime
 
@@ -20,7 +21,8 @@ icons = {
     "runtime_error": "exclamation-triangle",
     "presentation_error": "times",
     "extra_output": "times",
-    "pending": "sync"
+    "incomplete": "times",
+	"reject": "times"
 }
 verdict_name = {
     "ok": "Accepted",
@@ -28,8 +30,8 @@ verdict_name = {
     "tle": "Time Limit Exceeded",
     "runtime_error": "Runtime Error",
     "presentation_error": "Presentation Error",
-    "extra_output": "Extra Output",
-    "pending": "Pending..."
+    "incomplete": "Incomplete output",
+	"reject": "Reject submission"
 }
 
 def resultOptions(result):
@@ -41,6 +43,16 @@ def resultOptions(result):
             ans.append(h.option(verdict_name[res], value=res))
     return ans
 
+def judgedOptions(jResult):
+	    ans = []
+	    if jResult == "Review":
+	        ans.append(h.option("Review", value="Review", selected="selected"))
+	        ans.append(h.option("Judged", value="Judged"))
+	    else:
+	        ans.append(h.option("Review", value="Review"))
+	        ans.append(h.option("Judged", value="Judged", selected="selected"))
+	    return ans
+	
 class TestCaseTab(UIElement):
     def __init__(self, x, sub):
         num, result = x
@@ -74,9 +86,14 @@ class TestCaseData(UIElement):
         ])
 
 class SubmissionCard(UIElement):
-    def __init__(self, submission: Submission):
+    def __init__(self, submission: Submission, user: User):
         subTime = submission.timestamp
+        subStat = submission.submissionStatus
         probName = submission.problem.title
+        submission.checkout = user.id
+        submission.version += 1
+        submission.save()
+        curVer = submission.version
         cls = "red" if submission.result != "ok" else ""
         self.html = div(cls="modal-content", contents=[
             div(cls=f"modal-header {cls}", contents=[
@@ -85,7 +102,7 @@ class SubmissionCard(UIElement):
                     h.span(subTime, cls="time-format")
                 ),
                 """
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="removeCheckout('""" + submission.id + """')">
                     <span aria-hidden="true">&times;</span>
                 </button>"""
             ]),
@@ -93,11 +110,16 @@ class SubmissionCard(UIElement):
                 h.strong("Language: <span class='language-format'>{}</span>".format(submission.language)),
                 h.br(),
                 h.strong("Result: ",
-                    h.select(cls=f"result-choice {submission.id}", onchange=f"changeSubmissionResult('{submission.id}')", contents=[
+                    h.select(cls=f"result-choice {submission.id}", onchange=f"changeSubmissionResult('{submission.id}', '{curVer}')", contents=[
                         *resultOptions(submission.result)
                     ])
                 ),
                 h.br(),
+                h.strong("Judged Status: ",
+                    h.select(cls=f"result-choice {submission.id}", name="change-judged-status", id="change-judged-status", onchange=f"changeJudgedStatus('{submission.id}')", contents=[
+                        *judgedOptions(submission.submissionStatus)
+                    ])
+                ),
                 h.br(),
                 h.button("Rejudge", type="button", onclick=f"rejudge('{submission.id}')", cls="btn btn-primary rejudge"),
                 h.br(),
@@ -128,7 +150,9 @@ class SubmissionRow(UIElement):
                 h.i("&nbsp;", cls=f"fa fa-{icons[sub.result]}"),
                 h.span(verdict_name[sub.result])
             ),
-            onclick=f"submissionPopup('{sub.id}')"
+            h.td(sub.submissionStatus), 
+            h.td(sub.checkout),
+            onclick=f"submissionPopup('{sub.id}', '{sub.checkout}')"
         )
 
 class SubmissionTable(UIElement):
@@ -141,7 +165,9 @@ class SubmissionTable(UIElement):
                     h.th("Problem"),
                     h.th("Time"),
                     h.th("Language"),
-                    h.th("Result")
+                    h.th("Result"),
+                    h.th("Submission Status"),
+                    h.th("Checkout")
                 )
             ),
             h.tbody(
@@ -171,7 +197,7 @@ def judge(params, user):
     )
 
 def judge_submission(params, user):
-    return SubmissionCard(Submission.get(params[0]))
+    return SubmissionCard(Submission.get(params[0]), user)
 
 register.web("/judgeSubmission/([a-zA-Z0-9-]*)", "admin", judge_submission)
 register.web("/judge", "admin", judge)

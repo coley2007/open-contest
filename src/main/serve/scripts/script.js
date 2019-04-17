@@ -160,12 +160,18 @@ Problem page
 
     var icons = {
         "ok": "check",
+        "pending": "sync",
+        "extra_output": "times",
+        "incomplete": "times",
         "wrong_answer": "times",
         "tle": "clock",
         "runtime_error": "exclamation-triangle"
     };
     var verdict_name = {
         "ok": "Accepted",
+        "pending": "Pending...",
+        "extra_output": "Extra Output",
+        "incomplete": "Incomplete Output",
         "wrong_answer": "Wrong Answer",
         "tle": "Time Limit Exceeded",
         "runtime_error": "Runtime Error"
@@ -225,12 +231,12 @@ Problem page
         } else {
             var results = "";
             for (var i = 0; i < sub.results.length; i ++) {
-                var res = sub.results[i];
+                var res = sub.submissionStatus == "Review" && (sub.results[i] == "wrong_answer" || sub.results[i] == "incomplete" || sub.results[i] == "extra_output") ? "pending" : sub.results[i];
                 var icon = icons[res];
                 results += `<div class="col-2"><i class="fa fa-${icon}" title="${verdict_name[res]}"></i> Case #${i}</div>`;
             }
             $(".results.card .card-contents").html(`<div class="pad">
-                <h2>Result: ${verdict_name[sub.result]}</h2>
+            <h2>Result: ${verdict_name[sub.submissionStatus == "Review" ? "pending" : sub.result]}</h2>
                 <div class="row">
                     ${results}
                 </div>
@@ -675,24 +681,57 @@ Messages Page
 /*--------------------------------------------------------------------------------------------------
 Judging Page
 --------------------------------------------------------------------------------------------------*/
-    function changeSubmissionResult(id) {
+    function changeSubmissionResult(id, curVer) {
         var result = $(`.result-choice.${id}`).val();
-        $.post("/changeResult", {id: id, result: result}, result => {
-            if (result == "ok") {
+        $.post("/checkSubVersion", {id: id, curVer: curVer}, data => {
+            if (data !== "ok") {
+                alert("The submission change was cancelled. The submission has recently been changed by another user.");
                 window.location.reload();
+                return;
             } else {
-                alert(result);
+                $.post("/changeResult", {id: id, result: result}, result => {
+                    if (result == "ok") {
+                        window.location.reload();
+                    } else {
+                        alert(result);
+                    }
+                    });
             }
-        })
+        });
     }
 
-    function submissionPopup(id) {
-        $.post(`/judgeSubmission/${id}`, {}, data => {
-            $(".modal-dialog").html(data);
-            $(".result-tabs").tabs();
-            fixFormatting();
-            $(".modal").modal();
-        });
+    function submissionPopup(id, checkout) {
+        if (checkout !== ""){
+            $.post("/checkCheckout", {id: id, checkout: checkout}, data => {
+                if (data !== "ok") {
+                    let override = confirm(`${data} is already judging this submission. Do you wish to override?`);
+                    if (override) {
+                        $.post(`/judgeSubmission/${id}`, {}, data => {
+                            $(".modal-dialog").html(data);
+                            $(".result-tabs").tabs();
+                            fixFormatting();
+                            $(".modal").modal();
+                        });
+                    } else {
+                        return;
+                    }
+                } else {
+                    $.post(`/judgeSubmission/${id}`, {}, data => {
+                        $(".modal-dialog").html(data);
+                        $(".result-tabs").tabs();
+                        fixFormatting();
+                        $(".modal").modal();
+                    });
+                }
+            });
+        } else {
+            $.post(`/judgeSubmission/${id}`, {}, data => {
+                $(".modal-dialog").html(data);
+                $(".result-tabs").tabs();
+                fixFormatting();
+                $(".modal").modal();
+            });
+        }
     }
 
     function rejudge(id) {
@@ -703,5 +742,17 @@ Judging Page
             $(".rejudge").attr("disabled", false);
             $(".rejudge").removeClass("button-gray");
             alert(`New Result: ${verdict_name[data]}`);
+        });
+    }
+
+    function changeJudgedStatus(id) {
+        chosenStatus = $("#change-judged-status").val();
+        $.post("/changeJudgedStatus", {id: id, chosenStatus: chosenStatus}, data => {
+            window.location.reload()
+        });
+    }
+
+    function removeCheckout(id) {
+        $.post("/removeCheckout", {id: id}, data => {
         });
     }

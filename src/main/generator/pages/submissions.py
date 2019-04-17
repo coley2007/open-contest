@@ -12,7 +12,7 @@ class SubmissionDisplay(UIElement):
         self.html = Card("Submission to {} at <span class='time-format'>{}</span>".format(probName, subTime), [
             h.strong("Language: <span class='language-format'>{}</span>".format(submission.language)),
             h.br(),
-            h.strong("Result: <span class='result-format'>{}</span>".format(submission.result)),
+            h.strong("Result: <span class='result-format'>{}</span>".format(submission.result if submission.submissionStatus == "Judged" else "pending")),
             h.br(),
             h.br(),
             h.strong("Code:"),

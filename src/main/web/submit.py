@@ -1,7 +1,7 @@
 import os
 import logging
 from code.util import register
-from code.util.db import Submission, Problem
+from code.util.db import Submission, Problem, User, Contest
 import time
 import shutil
 import re
@@ -16,6 +16,8 @@ def addSubmission(probId, lang, code, user, type):
     sub.user = user
     sub.timestamp = time.time() * 1000
     sub.type = type
+    sub.submissionStatus = "Review"
+    sub.checkout = ""
     if type == "submit":
         sub.save()
     else:
@@ -82,6 +84,8 @@ def runCode(sub):
             res = "wrong_answer"
         if res == None:
             res = "tle"
+        if res == "ok" or res == "tle" or res == "runtime_error":
+	            sub.submissionStatus = "Judged"
         results.append(res)
 
         # Make result the first incorrect result
@@ -122,6 +126,7 @@ def changeResult(params, setHeader, user):
     if not sub:
         return "Error: incorrect id"
     sub.result = params["result"]
+    sub.checkout = ""
     sub.save()
     return "ok"
 
@@ -133,6 +138,43 @@ def rejudge(params, setHeader, user):
     runCode(submission)
     return submission.result
 
+def changeJudgedStatus(params, setHeader, user):
+	    id = params["id"]
+	    submission = Submission.get(id)
+	    submission.submissionStatus = params["chosenStatus"]
+	    submission.checkout = ""
+	    submission.save()
+	    return submission.submissionStatus
+	
+def removeCheckout(params, setHeader, user):
+    id = params["id"]
+    submission = Submission.get(id)
+    submission.checkout = ""
+    submission.save()
+
+def checkCheckout(params, setHeader, user):
+    id = params["id"]
+    checkout = params["checkout"]
+    submission = Submission.get(id)
+    checkoutUser = User.get(checkout)
+    if checkoutUser.id != user.id:
+        return checkoutUser.username
+    else:
+        return "ok"
+
+def checkSubVersion(params, setHeader, user):
+    id = params["id"]
+    curVer = int(params["curVer"])
+    submission = Submission.get(id)
+    if curVer == submission.version:
+        return "ok"
+    else:
+        return "different"
+
+register.post("/checkSubVersion", "admin", checkSubVersion)
+register.post("/checkCheckout", "admin", checkCheckout)
+register.post("/removeCheckout", "admin", removeCheckout)
+register.post("/changeJudgedStatus", "admin", changeJudgedStatus)
 register.post("/submit", "loggedin", submit)
 register.post("/changeResult", "admin", changeResult)
 register.post("/rejudge", "admin", rejudge)
