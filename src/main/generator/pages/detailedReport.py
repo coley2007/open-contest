@@ -91,7 +91,7 @@ def detailedReport(params, user):
                                 if sub.problem.id == infoBlock[0]:
                                     infoBlock[2] = infoBlock[2] + 1
                                     if infoBlock[1] != "--" and sub.result == "ok":
-                                        if int(sub.timestamp) > int(infoBlock[1]):
+                                        if int(sub.timestamp) < int(infoBlock[1]):
                                             infoBlock[1] = str(sub.timestamp)
                                     elif sub.result == "ok":
                                         infoBlock[1] = str(sub.timestamp)
@@ -120,7 +120,7 @@ def detailedReport(params, user):
                         cciDisplay.append(
                         # Times are currently set to Eastern with daylight saving (UTC minus four hours).
                         # Remove the "- 14400" in the following lines to change the time back to UTC.
-                        h.td(f"({str(info[2])}) {datetime.fromtimestamp((int(info[1])/1000) - 14400).strftime('%H:%M')}", cls="center")
+                        h.td(f"({str(info[2])}) {datetime.fromtimestamp((int(float(info[1]))/1000) - 14400).strftime('%H:%M')}", cls="center")
                         )
             if noEntries:
                 cciDisplay.append(
@@ -183,8 +183,9 @@ def detailedReport(params, user):
         for sub in allGoodSubs:
             curSub = sub
             if prob[1].id == curSub.problem.id:
-                prob[langIndexForLangDisplay[sub.language]] += 1
-                prob[10] += 1
+                if curSub.result == "ok":
+                    prob[langIndexForLangDisplay[sub.language]] += 1
+                    prob[10] += 1
 
     i = 0
     for x in range(len(allContProbsWithLangNums)):
