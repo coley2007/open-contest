@@ -72,6 +72,7 @@ def runCode(sub):
     errors = []
     results = []
     result = "ok"
+    oneWrong = False
 
     for i in range(tests):
         inputs.append(sub.problem.testData[i].input)
@@ -84,8 +85,12 @@ def runCode(sub):
             res = "wrong_answer"
         if res == None:
             res = "tle"
-        if res == "ok" or res == "tle" or res == "runtime_error":
-	            sub.submissionStatus = "Judged"
+        if (not oneWrong) and (res == "ok" or res == "tle" or res == "runtime_error"):
+            sub.submissionStatus = "Judged"
+        else:
+            sub.submissionStatus = "Review"
+            oneWrong = True
+
         results.append(res)
 
         # Make result the first incorrect result
