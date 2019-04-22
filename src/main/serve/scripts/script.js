@@ -718,7 +718,6 @@ Judging Page
 
         let diff = Diff.diffArrays(ansArr, outArr),
             fragment = "";
-            console.log(diff);
 
         diff.forEach(function(part){{
         // green for additions, red for deletions

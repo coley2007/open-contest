@@ -161,7 +161,6 @@ class SubmissionTable(UIElement):
 
 def judge(params, user):
     cont = Contest.getCurrent()
-    print(cont)
     if not cont:
         return Page(
             h1("&nbsp;"),
