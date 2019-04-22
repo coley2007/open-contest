@@ -119,7 +119,7 @@ class SubmissionCard(UIElement):
                 ])
             ])
         ])
-    
+
 class ProblemContent(UIElement):
     def __init__(self, x, cont):
         num, prob = x
