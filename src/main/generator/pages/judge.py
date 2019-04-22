@@ -63,11 +63,11 @@ class TestCaseData(UIElement):
             ]),
             div(cls="row", contents=[
                 div(cls="col-6", contents=[
-                    h.h4("Actual Output"),
+                    h.h4("Output"),
                     h.code(output.replace(" ", "&nbsp;").replace("\n", "<br/>"))
                 ]),
                 div(cls="col-6", contents=[
-                    h.h4("Answer"),
+                    h.h4("Correct Answer"),
                     h.code(answer.replace(" ", "&nbsp;").replace("\n", "<br/>"))
                 ])
             ]),
@@ -119,7 +119,7 @@ class SubmissionCard(UIElement):
                 ])
             ])
         ])
-        
+    
 class ProblemContent(UIElement):
     def __init__(self, x, cont):
         num, prob = x
