@@ -713,9 +713,12 @@ Judging Page
         let color = '',
         span = '';
 
-        let diff = Diff.diffLines(answer, output),
-            display = document.getElementById('diff'),
+        outArr = output.split("\n");
+        ansArr = answer.split("\n");
+
+        let diff = Diff.diffArrays(ansArr, outArr),
             fragment = "";
+            console.log(diff);
 
         diff.forEach(function(part){{
         // green for additions, red for deletions
@@ -724,8 +727,10 @@ Judging Page
                 part.removed ? 'darkred' : 'dimgrey';
             bgcolor = (color == 'darkgreen') ? ';background-color:palegreen' :
                 (color == 'darkred') ? ';background-color:#F6B0B0' : ''
-            span = '<div style="color:{0}{1}">{2}</div>'.replace("{0}", color).replace("{1}", bgcolor).replace("{2}", part.value.replace(/ /g, "&nbsp;").replace(/\n/g, "<br/>"));
-            fragment += span;
+            part.value.forEach(function(item) {
+                span = '<div style="color:{0}{1}">{2}<br/></div>'.replace("{0}", color).replace("{1}", bgcolor).replace("{2}", item.replace(/ /g, "&nbsp;"));
+                fragment += span;
+            });
         }});
         return fragment;
             

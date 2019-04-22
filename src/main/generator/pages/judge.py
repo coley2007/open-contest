@@ -20,9 +20,7 @@ icons = {
     "runtime_error": "exclamation-triangle",
     "presentation_error": "times",
     "extra_output": "times",
-    "pending": "sync",
-    "incomplete": "exclamation-triangle",
-    "reject": "times"
+    "pending": "sync"
 }
 verdict_name = {
     "ok": "Accepted",
@@ -31,9 +29,7 @@ verdict_name = {
     "runtime_error": "Runtime Error",
     "presentation_error": "Presentation Error",
     "extra_output": "Extra Output",
-    "pending": "Pending...",
-    "incomplete": "Incomplete output",
-    "reject": "Reject submission"
+    "pending": "Pending..."
 }
 
 def resultOptions(result):
@@ -79,8 +75,8 @@ class TestCaseData(UIElement):
                 div(cls="col-12", contents=[
                     h.h4("Diff"),
                     h.em("Insertions are in <span style=color:darkgreen;background-color:palegreen>green</span>, deletions are in <span style=color:darkred;background-color:#F6B0B0>red</span>"),
-                    h.code(id="diff", contents=[
-                        h.script(f"document.getElementById('diff').innerHTML = getDiff(`{output}`, `{answer}`)")
+                    h.code(id=f"diff-{sub.id}-{num}", contents=[
+                        h.script(f"document.getElementById('diff-{sub.id}-{num}').innerHTML = getDiff(`{output.rstrip()}`, `{answer.rstrip()}`)")
                     ])
                 ])
             ])
